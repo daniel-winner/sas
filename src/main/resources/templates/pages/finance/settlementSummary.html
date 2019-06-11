@@ -167,8 +167,8 @@
     }
 
     $(document).ready(function () {
-
-        var $dataTable = $("#dataTable table").bootstrapTable({
+        $("#dataTable table").bootstrapTable({
+            method: "POST",
             cache: false,
             clickToSelect: true,
             pagination: true,
@@ -181,24 +181,21 @@
             striped: true,
             toggle: true,
             silent: true,
-            //height: $(parent.window).height() - 145,
             sidePagination:"server",
             url:"/finance/settlementSummary",
             queryParams : function(params) {
                 var temp = {
                     limit : params.limit,
                     offset : params.offset,
-                    page : (params.offset / params.limit) + 1,
                     sort: params.sort,
                     sortOrder: params.order
                 };
-                return temp;
+                return JSON.stringify(temp);
             },columns: [{
                 field: 'rowNum',
                 title: '序号',
                 align: 'center',
-                valign: 'middle',
-                sortable: 'true'
+                valign: 'middle'
             }, {
                 field: 'code',
                 title: '编码',
@@ -215,8 +212,7 @@
                 field: 'channel',
                 title: '来源',
                 align: 'center',
-                valign: 'middle',
-                sortable: 'true'
+                valign: 'middle'
             },{
                 field: 'deliveryAmount',
                 title: '发货金额',
@@ -247,18 +243,26 @@
                 align: 'center',
                 valign: 'middle',
                 sortable: 'true'
-            }],onLoadSuccess : function() {
+            }],
+            onLoadSuccess : function() {
 
             },
             onLoadError : function() {
-                showTips("数据加载失败！");
+                console.log("数据加载失败！");
             },
             onDblClickRow : function(row, $element) {
 
-            }
+            },
+            showExport: true,      //是否显示导出
+            exportDataType: "all",              //basic', 'all', 'selected'.
+            exportTypes:['excel'],  //导出文件类型
+            Icons:'glyphicon glyphicon-export'
+
         });
 
     });
+
+
 </script>
 
 </html>
