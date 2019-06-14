@@ -12,6 +12,12 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+/**
+ * @ClassName BaseRouter
+ * @Description
+ * @Author zc
+ * @Date 2019/6/10 08:00
+ **/
 @Configuration
 public class BaseRouter {
 

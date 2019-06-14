@@ -7,7 +7,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-public class JsonUtil {
+/**
+ * @ClassName CommonUtils
+ * @Description
+ * @Author zc
+ * @Date 2019/6/12 8:00
+ **/
+public class JsonUtils {
 
     /**
      * 把ResultSet集合转换成JsonArray数组，包含列名数据。

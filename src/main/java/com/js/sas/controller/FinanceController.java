@@ -1,16 +1,21 @@
 package com.js.sas.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.js.sas.utils.JsonUtil;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
+import com.js.sas.utils.CommonUtils;
+import com.js.sas.utils.ExportExcelUtils;
+import com.js.sas.utils.JsonUtils;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,63 +33,71 @@ public class FinanceController {
     private DataSource dataSource;
 
     @ApiOperation(value = "结算客户对账单汇总（线上、线下）", notes = "数据来源：用友；数据截止日期：昨天")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "开始日期", required = false, paramType = "query", dataType = "date"),
-            @ApiImplicitParam(name = "endDate", value = "结束日期", required = false, paramType = "query", dataType = "date"),
-            @ApiImplicitParam(name = "offset", value = "起始序号", required = false, paramType = "query", dataType = "int"),
-            @ApiImplicitParam(name = "limit", value = "每页数量", required = false, paramType = "query", dataType = "int"),
-            @ApiImplicitParam(name = "sort", value = "排序字段", required = false, paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "sortOrder", value = "排序规则", required = false, paramType = "query", dataType = "string")
-    })
     @PostMapping("/settlementSummary")
-    public Mono<JSONObject> settlementSummary(@RequestBody Map<String, String> params) {
+    public Mono<JSONObject> settlementSummary(@ApiParam @RequestBody Map<String, String> params) {
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
-        String offset = Optional.ofNullable(params.get("offset")).orElse("0");
-        String limit = Optional.ofNullable(params.get("limit")).orElse("10");
+        String name = Optional.ofNullable(params.get("name")).orElse("");
+        String channel = Optional.ofNullable(params.get("channel")).orElse("");
+
+        String startDate = Optional.ofNullable(CommonUtils.isValidDate(params.get("startDate"))).orElse("2018-12-28");
+        String endDate = Optional.ofNullable(CommonUtils.isValidDate(params.get("endDate"))).orElse(today);
+        int offset = CommonUtils.toInt(params.get("offset")).orElse(0);
+        int limit = CommonUtils.toInt(params.get("limit")).orElse(10);
         String sort = Optional.ofNullable(params.get("sort")).orElse("name");
         String sortOrder = Optional.ofNullable(params.get("sortOrder")).orElse("asc");
 
-        Connection con = null;
-        PreparedStatement statement = null;
-        ResultSet res = null;
+        return Mono.just(getDatas(name, channel, startDate, endDate, offset, limit, sort, sortOrder));
+    }
+
+
+    @GetMapping("/settlementSummary/download/excel")
+    public Mono<Void> download(@RequestBody Map<String, String> params, ServerHttpResponse response) throws IOException {
+
+        return new ExportExcelUtils().createExcel(response, "结算客户汇总（线上、线下）.xlsx");
+
+    }
+
+    private JSONObject getDatas(String name, String channel, String startDate, String endDate, int offset, int limit, String sort, String sortOrder) {
         JSONObject result = null;
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
             con = dataSource.getConnection();
-            CallableStatement c = con.prepareCall("{call PROC_SettlementSummary_OnLineOffLine(?,?,?,?,?,?,?)}");
-            c.setString("startDate", "2019-04-28");
-            c.setString("endDate", "2019-05-27");
-            c.setInt("offsetNum", Integer.parseInt(offset));
-            c.setInt("limitNum", Integer.parseInt(limit));
+            CallableStatement c = con.prepareCall("{call PROC_SettlementSummary_OnLineOffLine(?,?,?,?,?,?,?,?,?)}");
+            c.setString("settlementName", name.trim());
+            c.setString("channel", channel);
+            c.setString("startDate", startDate);
+            c.setString("endDate", endDate);
+            c.setInt("offsetNum", offset);
+            c.setInt("limitNum", limit);
             c.setString("sort", sort);
             c.setString("sortOrder", sortOrder);
 
-            ResultSet rs = c.executeQuery();
+            rs = c.executeQuery();
 
-            try {
-                result = JsonUtil.formatRsToJsonArray(rs);
-                result.put("total", c.getString("totalNum"));
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            result = JsonUtils.formatRsToJsonArray(rs);
+            result.put("total", c.getString("totalNum"));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                if (res != null) {
-                    res.close();
+                if (rs != null) {
+                    rs.close();
                 }
-                if (statement != null) {
-                    statement.close();
+                if (ps != null) {
+                    ps.close();
                 }
                 if (con != null) {
                     con.close();
                 }
-            } catch (Exception e2) {
-                e2.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
-        return Mono.just(result);
+        return result;
     }
 
 }

@@ -4,6 +4,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * @ClassName SettlementSummaryEntity
+ * @Description 结算客户财务统计
+ * @Author zc
+ * @Date 2019/6/10 08:00
+ **/
 @Entity
 public class SettlementSummaryEntity implements Serializable {
 
