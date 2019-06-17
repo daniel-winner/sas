@@ -32,7 +32,7 @@ public class PartnerController {
 
     @ApiOperation(value = "根据名称模糊查询往来单位，必须设置数量", notes = "数据来源：用友；数据截止日期：昨天")
     @PostMapping("/getPartnerByNameLikeLimit")
-    public Mono<Object> getPartnerByNameLikeLimit(@ApiParam PartnerDTO partnerDTO) {
+    public Mono<Object> getPartnerByNameLikeLimit(PartnerDTO partnerDTO) {
         // 往来单位名称
         partnerDTO.setName(Optional.ofNullable(partnerDTO.getName()).orElse(""));
 

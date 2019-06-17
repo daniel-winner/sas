@@ -119,7 +119,7 @@
                             </div>
                         </div>
                         <div class="ibox-content">
-                            <form class="form-horizontal">
+                            <form id="form1" class="form-horizontal">
                                 <div class="box-body">
                                     <div class="row">
 
@@ -345,10 +345,14 @@
             $("input[name='name']").val("");
             $("input[name='dateRange']").val("");
             $("select[name='channel']").find("option:selected").prop("selected", "");
-            $("select[name='channel']").find("option[text='全部']").prop("selected","selected");
+            $("select[name='channel']").find("option[text='全部']").prop("selected", "selected");
         });
 
         $("button[id='export']").click(function () {
+
+            $("#form1").attr('action', "/finance/settlementSummary/download/excel");
+            $("#form1").attr('method', "POST");
+            $("#form1").submit();
 
         });
 
