@@ -1,8 +1,5 @@
 package com.js.sas.dto;
 
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 

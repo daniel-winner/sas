@@ -1,7 +1,6 @@
 package com.js.sas.utils;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
