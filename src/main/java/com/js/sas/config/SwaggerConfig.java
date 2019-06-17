@@ -1,4 +1,4 @@
-package com.js.sas;
+package com.js.sas.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

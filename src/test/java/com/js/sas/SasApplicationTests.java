@@ -14,9 +14,4 @@ public class SasApplicationTests {
 
     }
 
-    @Test
-    public void test() throws Exception{
-
-    }
-
 }

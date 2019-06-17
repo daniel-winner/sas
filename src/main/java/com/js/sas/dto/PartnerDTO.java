@@ -1,10 +1,6 @@
 package com.js.sas.dto;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
